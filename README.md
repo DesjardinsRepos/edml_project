@@ -13,11 +13,17 @@ This tool enables users to quickly gain insights into datasets from OpenML, Kagg
 ✅ Automatically resolve data quality issues <br>
 ✅ Integrated fairness analysis & performance evaluation using AutoGluon
 
+## Environment
+To enable API access for the dataset repository platforms and to execute OpenAI queries, you need to specify certain environment variables in the .env file:
+- HF_TOKEN: your Huggingface API key
+- OPENAI_KEY: your OpenAI API key
+
+To use the Kaggle API, you need to create a file in your config directory as specified [here](https://github.com/Kaggle/kaggle-api/blob/main/docs/README.md).
+
 ## Usage
 ```python
 from edml_project import get_dataset, autoML_prep, DataSummary, AutoMLModel, FairnessAssessor
 
-# Load dataset
 data = get_dataset("https://www.kaggle.com/datasets/yasserh/titanic-dataset")
 
 # Profile data & print a summary
@@ -43,17 +49,14 @@ cleaned_processed_data = autoML_prep(data)
 enhanced_model = AutoMLModel(cleaned_processed_data, time_limit=300, preset="good", load=False)
 enhanced_model.run_auto_ml()
 enhanced_automl_data = enhanced_model.auto_ml_data
-
 # Fairness analysis of original dataset
-fairness_baseline = FairnessAssessor(baseline_automl_data, profiled_data)
-fairness_baseline.analyze_all_categorical()
-# fairness_baseline.analyze_all_sens()
+fairness_baseline = FairnessAssessor(baseline_automl_data)
+fairness_baseline.analyze_all()
 baseline_fairness_metrics = fairness_baseline.get_all_metrics()
 
 # Fairness analysis with improved data
-fairness_enhanced = FairnessAssessor(enhanced_automl_data, profiled_data)
-fairness_enhanced.analyze_all_categorical()
-# fairness_enhanced.analyze_all_sens()
+fairness_enhanced = FairnessAssessor(enhanced_automl_data)
+fairness_enhanced.analyze_all()
 enhanced_fairness_metrics = fairness_enhanced.get_all_metrics()
 ```
 
